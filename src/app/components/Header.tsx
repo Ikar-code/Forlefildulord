@@ -1,13 +1,36 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "../utils/supabase/clients";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isAdmin = location.pathname.startsWith("/admin");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("categorie")
+        .eq("statut", "published")
+        .not("categorie", "is", null);
+
+      if (!error && data) {
+        const uniques = [...new Set(data.map((d) => d.categorie))].sort();
+        setCategories(uniques);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  function handleCategoryClick(cat) {
+    navigate(`/?categorie=${encodeURIComponent(cat)}`);
+  }
 
   return (
     <header className="bg-card border-b border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        {/* Top bar */}
         <div className="flex items-center justify-between py-1 border-b border-border text-xs text-muted-foreground">
           <span style={{ fontFamily: "var(--font-body)" }}>
             Publication automatisée par IA · Groupe Fairy Lord
@@ -19,8 +42,7 @@ export function Header() {
           >
             {isAdmin ? "← Retour au site" : "Dashboard admin"}
           </Link>
-
-        {/* Masthead */}
+        </div>
         <div className="py-5 text-center border-b border-border">
           <Link to="/" className="inline-block">
             <h1
@@ -37,12 +59,18 @@ export function Header() {
             </p>
           </Link>
         </div>
-
-        {/* Nav */}
         <nav className="flex items-center gap-6 py-2 overflow-x-auto">
-          {["Politique", "Économie", "Technologie", "Société", "Environnement", "Sport"].map((cat) => (
+          <button
+            onClick={() => navigate("/")}
+            className="text-xs font-medium text-muted-foreground hover:text-accent transition-colors whitespace-nowrap"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            Tout
+          </button>
+          {categories.map((cat) => (
             <button
               key={cat}
+              onClick={() => handleCategoryClick(cat)}
               className="text-xs font-medium text-muted-foreground hover:text-accent transition-colors whitespace-nowrap"
               style={{ fontFamily: "var(--font-body)" }}
             >
