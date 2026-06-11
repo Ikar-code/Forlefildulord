@@ -13,13 +13,12 @@ export function Header() {
             Publication automatisée par IA · Groupe Fairy Lord
           </span>
           <Link
-            to="/admin"
+            to={isAdmin ? "/" : "/admin"}
             className="hover:text-accent transition-colors duration-150"
             style={{ fontFamily: "var(--font-body)" }}
           >
             {isAdmin ? "← Retour au site" : "Dashboard admin"}
           </Link>
-        </div>
 
         {/* Masthead */}
         <div className="py-5 text-center border-b border-border">
