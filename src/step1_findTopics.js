@@ -3,44 +3,37 @@ import { log } from './logger.js';
 
 export async function findTopics() {
   const model = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash-lite',
-  tools: [{ googleSearch: {} }]
-});
+    model: 'gemini-2.5-flash-lite',
+    tools: [{ googleSearch: {} }]
+  });
 
-const annee = new Date().getFullYear();
+  const annee = new Date().getFullYear();
 
-const prompt = `
+  const prompt = `
 Tu es rédacteur en chef d'un média francophone spécialisé dans l'actualité.
-
 Nous sommes en ${annee}.
 
 Mission :
 Identifier 5 sujets d'actualité RÉELS, IMPORTANTS et VÉRIFIABLES de l'année ${annee}.
 
-Règles obligatoires :
+RÈGLE FONDAMENTALE :
+Chaque sujet doit être déclenché par un événement précis : une décision, une annonce,
+un vote, une étude, une publication officielle, un chiffre publié, ou une mesure
+entrée en vigueur en ${annee}.
+Interdiction de proposer un simple thème, un débat général ou une tendance de fond.
+Le lecteur doit pouvoir répondre immédiatement à la question : "Qu'est-ce qui s'est passé,
+quand, et qui est concerné ?"
 
+Règles obligatoires :
 - Utilise Google Search pour vérifier chaque sujet.
 - N'utilise AUCUNE information antérieure à ${annee}, sauf pour apporter du contexte.
 - N'invente aucun fait, chiffre ou déclaration.
-- Privilégie les sujets reposant sur un événement concret :
-  - décision politique,
-  - vote,
-  - loi,
-  - crise,
-  - étude,
-  - rapport,
-  - innovation,
-  - enquête,
-  - scandale,
-  - polémique documentée,
-  - phénomène viral mesurable.
 
 Pays autorisés :
 France, Belgique, Suisse, Luxembourg, Québec, Canada francophone,
 Maroc, Algérie, Tunisie, Sénégal, Côte d'Ivoire, Cameroun et autres pays francophones.
 
 Mix obligatoire :
-
 1 sujet politique ou géopolitique majeur.
 1 sujet économique ou énergétique.
 1 sujet technologie / IA.
@@ -48,18 +41,22 @@ Mix obligatoire :
 1 sujet viral, insolite ou fortement débattu sur les réseaux.
 
 Pour chaque sujet :
-
-- créer un titre journalistique attractif mais factuel ;
-- fournir un résumé de 80 à 120 mots ;
-- expliquer pourquoi le sujet fait l'actualité ;
-- inclure au moins un élément concret (date, chiffre, décision, déclaration, étude, vote ou événement) ;
-- éviter les formulations vagues comme :
-  "suscite des débats",
-  "fait polémique",
-  "au cœur des discussions"
-  sans expliquer précisément pourquoi.
-
-Le titre doit refléter exactement le contenu.
+- Le TITRE doit annoncer le fait précis (qui, quoi, quand), pas un thème vague.
+  Mauvais exemple : "La France donne le coup d'envoi au Règlement Européen"
+  Bon exemple : "IA : les premières obligations du règlement européen entrent en
+  application le [date]"
+- La DESCRIPTION (80-120 mots) doit OBLIGATOIREMENT commencer par le fait
+  d'actualité principal, avec une date et/ou un chiffre précis dès la première phrase.
+- INTERDICTION de commencer la description par : "Dans un contexte...",
+  "Alors que...", "Cette initiative...", "Le débat autour de...",
+  "Face à..."
+- Citer au moins un acteur identifié (institution, entreprise, personnalité,
+  organisation) directement impliqué dans l'événement.
+- Inclure au moins un élément concret et vérifiable : date exacte, chiffre,
+  nom de loi/règlement, déclaration, résultat de vote ou d'étude.
+- INTERDIT : formulations vagues type "suscite des débats", "fait polémique",
+  "au cœur des discussions" sans préciser immédiatement qui débat, depuis quand,
+  et sur quel point précis.
 
 Réponds UNIQUEMENT en JSON, format strict :
 [
@@ -69,9 +66,7 @@ Réponds UNIQUEMENT en JSON, format strict :
 Pas de texte avant/après, pas de markdown.`;
 
   const result = await model.generateContent(prompt);
-  console.log('Réponse brute Gemini:', JSON.stringify(result.response, null, 2));
   const text = result.response.text().trim();
-  console.log('Texte extrait (longueur ' + text.length + '):', text);
   const cleaned = text.replace(/```json|```/g, '').trim();
 
   let topics;
