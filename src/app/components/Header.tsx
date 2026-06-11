@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "../../../utils/supabase/clients";
+import { supabase } from "../../../utils/supabase/client";
 
 export function Header() {
   const location = useLocation();
