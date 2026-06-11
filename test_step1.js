@@ -1,4 +1,4 @@
-const { findTopics } = require('./src/step1_findTopics');
+import { findTopics } from './src/step1_findTopics.js';
 
 (async () => {
   try {
