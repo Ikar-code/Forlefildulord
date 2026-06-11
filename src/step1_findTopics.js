@@ -4,11 +4,19 @@ import { log } from './logger.js';
 export async function findTopics() {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
-  const prompt = `Tu es un veilleur d'actualité francophone.
-Propose 3 sujets d'actualité RÉCENTE et pertinente (derniers jours), variés (pas uniquement politique).
+  const prompt = `Tu es un veilleur d'actualité francophone expert en tendances et buzz.
+Propose 5 sujets d'actualité RÉCENTE (derniers 48h maximum), variés et percutants.
+Mix obligatoire :
+- 1 sujet politique ou géopolitique chaud
+- 1 sujet technologie ou IA
+- 1 sujet société ou fait divers marquant
+- 1 sujet polémique ou débat en cours (réseau sociaux, culture, sport)
+- 1 sujet viral ou insolite du moment
+
+Pour chaque sujet, choisis l'angle le plus accrocheur et potentiellement clivant sans être mensonger.
 Réponds UNIQUEMENT en JSON, format strict :
 [
-  {"titre": "...", "description": "...", "source": "..."},
+  {"titre": "...", "description": "...", "source": "...", "categorie": "..."},
   ...
 ]
 Pas de texte avant/après, pas de markdown.`;
