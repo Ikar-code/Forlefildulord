@@ -54,7 +54,7 @@ export function PrivacyPage() {
             Si vous acceptez les cookies publicitaires, Google et ses partenaires peuvent utiliser
             des cookies pour diffuser des annonces personnalisées en fonction de votre navigation.
             Vous pouvez gérer vos préférences publicitaires directement sur{" "}
-            
+            <a>
               href="https://adssettings.google.com"
               target="_blank"
               rel="noopener noreferrer"
