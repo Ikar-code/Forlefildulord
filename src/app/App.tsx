@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, Link } from "react-router";
 import { Header } from "./components/Header";
 import { HomePage } from "./components/HomePage";
 import { ArticlePage } from "./components/ArticlePage";
 import { AdminDashboard } from "./components/AdminDashboard";
+import { PrivacyPage } from "./components/PrivacyPage";
 
 function Footer() {
   return (
@@ -11,9 +12,18 @@ function Footer() {
         <p className="text-xs text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
           © 2026 Le Fil du Lord · Groupe Fairy Lord
         </p>
-        <p className="text-xs text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
-          Contenu généré automatiquement par IA · Deux publications par semaine
-        </p>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/politique-de-confidentialite"
+            className="text-xs text-muted-foreground hover:text-accent transition-colors"
+            style={{ fontFamily: "var(--font-body)" }}
+          >
+            Politique de confidentialité
+          </Link>
+          <p className="text-xs text-muted-foreground" style={{ fontFamily: "var(--font-body)" }}>
+            Contenu généré automatiquement par IA · Deux publications par semaine
+          </p>
+        </div>
       </div>
     </footer>
   );
@@ -30,6 +40,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/article/:id" element={<ArticlePage />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/politique-de-confidentialite" element={<PrivacyPage />} />
           </Routes>
         </div>
         <Footer />
