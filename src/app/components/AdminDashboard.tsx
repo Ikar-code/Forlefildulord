@@ -94,10 +94,59 @@ function ScorePill({ score }: { score: number }) {
   );
 }
 
+function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
+      sessionStorage.setItem("admin_auth", "true");
+      onSuccess();
+    } else {
+      setError(true);
+    }
+  }
+
+  return (
+    <main className="max-w-sm mx-auto px-4 py-24">
+      <h1 className="text-xl font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>
+        Accès administrateur
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => { setPassword(e.target.value); setError(false); }}
+          placeholder="Mot de passe"
+          className="w-full border border-border rounded-sm px-3 py-2 text-sm bg-card text-foreground"
+          style={{ fontFamily: "var(--font-body)" }}
+          autoFocus
+        />
+        {error && (
+          <p className="text-xs text-red-600" style={{ fontFamily: "var(--font-body)" }}>
+            Mot de passe incorrect
+          </p>
+        )}
+        <button
+          type="submit"
+          className="w-full bg-foreground text-primary-foreground rounded-sm px-3 py-2 text-sm font-medium"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Se connecter
+        </button>
+      </form>
+    </main>
+  );
+}
+
 type Tab = "articles" | "sujets" | "journaux";
 type SortField = "date" | "score" | "statut";
 
 export function AdminDashboard() {
+  const [authed, setAuthed] = useState(
+    sessionStorage.getItem("admin_auth") === "true"
+  );
   const [articles, setArticles] = useState<Article[]>([]);
   const [sujets, setSujets] = useState<Sujet[]>([]);
   const [journaux, setJournaux] = useState<Journal[]>([]);
@@ -108,6 +157,8 @@ export function AdminDashboard() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
+    if (!authed) return;
+
     async function load() {
       try {
         const [aRes, sRes, jRes] = await Promise.all([
@@ -127,7 +178,7 @@ export function AdminDashboard() {
             date_publication: a.date_publication || a.date_creation,
           }))
         );
-        
+
         setSujets((sRes.data || []) as Sujet[]);
 
         setJournaux(
@@ -146,7 +197,7 @@ export function AdminDashboard() {
       }
     }
     load();
-  }, []);
+  }, [authed]);
 
   const filteredArticles = useMemo(() => {
     let arr = filterStatut === "all" ? articles : articles.filter(a => a.statut === filterStatut);
@@ -186,6 +237,10 @@ export function AdminDashboard() {
     { id: "sujets", label: "Sujets", count: sujets.length },
     { id: "journaux", label: "Journaux", count: journaux.length },
   ];
+
+  if (!authed) {
+    return <AdminLogin onSuccess={() => setAuthed(true)} />;
+  }
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
